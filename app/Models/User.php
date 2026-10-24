@@ -9,24 +9,74 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password','phone','google_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that are mass assignable.
      *
-     * @return array<string, string>
+     * @var array<int, string>
      */
-    protected function casts(): array
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'password',
+        'google_id'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    /**
+     * fields ordering in filteration
+     */
+    const ORDER = ['name', 'email'];
+
+    ##--------------------------------- RELATIONSHIPS
+    public function ads()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(Ad::class);
     }
+
+
+
+    ##--------------------------------- ATTRIBUTES
+
+
+    ##--------------------------------- CUSTOM FUNCTIONS
+    public function nameOnHeader()
+    {
+        if (strlen($this->name) > 10) {
+            return \substr($this->name, 0, 10) . '..';
+        }
+        return $this->name;
+    }
+
+
+    ##--------------------------------- SCOPES
+
+
+    ##--------------------------------- ACCESSORS & MUTATORS
 }

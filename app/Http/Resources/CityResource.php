@@ -18,7 +18,7 @@ class CityResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-           // 'districts'=>DistrictResource::collection($this->districts),
+            'districts'=>DistrictResource::collection($this->districts),
 
         ];
     }

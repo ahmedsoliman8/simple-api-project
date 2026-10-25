@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\DistrictController;
@@ -18,16 +19,30 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->middleware('auth:sanctum');
 });
 
-//Auth Setting
+//Setting Modula
 Route::get('/settings', SettingController::class);
-//Auth City
+// City Modula
 Route::get('/cities', CityController::class);
-//Auth Distract
+// Distract Modula
 Route::get('/districts', DistrictController::class);
-//Auth Message
+// Message Modula
 
 Route::post('/message', MessageController::class);
-//Auth Domain
+// Domain Modula
 
 Route::get('/domains', DomainController::class);
+
+//Ads Modula
+Route::prefix('ads')->controller(AdController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::get('/latest', 'latest');
+    Route::get('/domain/{domain_id}', 'domain');
+    Route::get('/search', 'search');
+    //User Ads Modula
+    Route::middleware(['auth:sanctum'])->group(function () {
+         Route::post('/create', 'create');
+         Route::post('/update', 'update');
+    });
+});
+
 

@@ -10,6 +10,7 @@ use App\Http\Resources\AdResource;
 use App\Models\Ad;
 use App\Traits\AdsCustomize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AdController extends Controller
 {
@@ -76,7 +77,7 @@ class AdController extends Controller
 
 
         if ($ad->user_id != $request->user()->id) {
-            return ApiResponse::sendResponse(403, 'Unauthorized', []);
+            return ApiResponse::sendResponse(403, 'you are not allowed to take  this action', []);
         }
         $data = $request->validated();
         $record = $ad->update($data);
@@ -85,5 +86,36 @@ class AdController extends Controller
             return ApiResponse::sendResponse(201, 'Your Ad Updated Successfully', new AdResource($ad));
 
         }
+    }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(),
+            [
+                'ad_id' => ['required', 'integer', 'exists:ads,id']
+            ], [], [
+                'ad_id' => 'AdId',
+
+            ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::sendResponse(422, 'Login Validation Errors', $validator->errors());
+        }
+        $ad = Ad::findOrFail($request->ad_id);
+        if ($ad->user_id != $request->user()->id) {
+            return ApiResponse::sendResponse(403, 'you are not allowed to take  this action',  []);
+        }
+
+        $record = $ad->delete();
+
+        if ($record) {
+            return ApiResponse::sendResponse(200, 'Your Ad deleted Successfully', []);
+
+        }
+    }
+
+    public function myads(Request $request){
+       $ads= $request->user()->ads()->latest()->paginate(10);
+        return $this->customizeAdsPagination($ads);
     }
 }

@@ -40,8 +40,10 @@ Route::prefix('ads')->controller(AdController::class)->group(function () {
     Route::get('/search', 'search');
     //User Ads Modula
     Route::middleware(['auth:sanctum'])->group(function () {
-         Route::post('/create', 'create');
-         Route::post('/update', 'update');
+        Route::post('/create', 'create');
+        Route::post('/update', 'update');
+        Route::post('/delete', 'delete');
+        Route::get('/myads', 'myads');
     });
 });
 
